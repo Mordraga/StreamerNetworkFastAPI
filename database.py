@@ -1,10 +1,11 @@
-import sqlite3
+import os
+import psycopg2
+import psycopg2.extras
 
-DB_NAME = "streamer_network.db"
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 def get_db():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
     return conn
 
 def initialize_db():
@@ -12,7 +13,7 @@ def initialize_db():
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS contacts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             user_id TEXT NOT NULL,
             data TEXT NOT NULL
         )
