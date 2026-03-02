@@ -59,5 +59,20 @@ async def validate(request: Request):
     if resp.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    data = resp.json()
-    return {"user_id": data["login"], "display_name": data["login"]}
+    login = resp.json()["login"]
+
+    async with httpx.AsyncClient() as client:
+        user_resp = await client.get(
+            f"https://api.twitch.tv/helix/users?login={login}",
+            headers={
+                "Authorization": auth,
+                "Client-Id": TWITCH_CLIENT_ID
+            }
+        )
+
+    user_data = user_resp.json()["data"][0]
+    return {
+        "user_id": login,
+        "display_name": user_data["display_name"],
+        "profile_image_url": user_data["profile_image_url"]
+    }
