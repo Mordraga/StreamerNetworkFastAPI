@@ -29,7 +29,7 @@ def login():
 
 @router.get("/auth/callback")
 async def callback(code: str):
-    """Exchange code for token, return to frontend with token"""
+    """Exchange code for token, return as JSON"""
     async with httpx.AsyncClient() as client:
         resp = await client.post(TWITCH_TOKEN_URL, params={
             "client_id": TWITCH_CLIENT_ID,
@@ -43,10 +43,7 @@ async def callback(code: str):
         raise HTTPException(status_code=400, detail="Token exchange failed")
 
     data = resp.json()
-    access_token = data["access_token"]
-
-    # Redirect to frontend with token in URL fragment
-    return RedirectResponse(f"{FRONTEND_URL}/#token={access_token}")
+    return {"access_token": data["access_token"]}
 
 
 @router.get("/auth/validate")
