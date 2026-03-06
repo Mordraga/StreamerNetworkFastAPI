@@ -18,5 +18,11 @@ def initialize_db():
             data TEXT NOT NULL
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_preferences (
+            user_id TEXT PRIMARY KEY,
+            onboarding_dismissed BOOLEAN NOT NULL DEFAULT FALSE
+        )
+    ''')
     conn.commit()
     conn.close()
