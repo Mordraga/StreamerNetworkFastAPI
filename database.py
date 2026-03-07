@@ -24,5 +24,10 @@ def initialize_db():
             onboarding_dismissed BOOLEAN NOT NULL DEFAULT FALSE
         )
     ''')
+    # Migrations
+    cursor.execute("ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS theme TEXT NOT NULL DEFAULT 'dark'")
+    cursor.execute("ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS timezone TEXT")
+    cursor.execute("ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS display_name_override TEXT")
+    cursor.execute("ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS time_format TEXT NOT NULL DEFAULT '12'")
     conn.commit()
     conn.close()
