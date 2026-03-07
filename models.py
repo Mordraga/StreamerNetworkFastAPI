@@ -7,3 +7,4 @@ class Contact(BaseModel):
     keywords: Optional[list] = []
     links: Optional[list] = []
     availability: Optional[dict] = None
+    pronouns: Optional[str] = None
