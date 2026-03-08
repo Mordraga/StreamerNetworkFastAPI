@@ -46,7 +46,7 @@ async def update_preferences(prefs: PreferencesUpdate, user_id: str = Depends(ge
     cursor.execute(
         """
         INSERT INTO user_preferences (user_id, onboarding_dismissed, theme, timezone, display_name_override, time_format)
-        VALUES (%s, COALESCE(%s, FALSE), COALESCE(%s, 'dark'), %s, %s, COALESCE(%s, '12'))
+        VALUES (%s, %s, %s, %s, %s, %s)
         ON CONFLICT (user_id) DO UPDATE SET
             onboarding_dismissed = COALESCE(EXCLUDED.onboarding_dismissed, user_preferences.onboarding_dismissed),
             theme = COALESCE(EXCLUDED.theme, user_preferences.theme),
