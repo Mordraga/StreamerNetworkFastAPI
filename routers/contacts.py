@@ -1,36 +1,18 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from database import get_db
 from models import Contact
-import httpx
 import json
+from routers.auth import resolve_user_from_auth_header
 
 router = APIRouter()
 
-TWITCH_VALIDATE_URL = "https://id.twitch.tv/oauth2/validate"
-GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
-
-
 async def get_current_user(request: Request) -> str:
-    """Validate Google or Twitch bearer token and return stable user id."""
+    """Validate bearer token and return stable user id across providers."""
     auth = request.headers.get("Authorization")
     if not auth:
         raise HTTPException(status_code=401, detail="Not authenticated")
-
-    async with httpx.AsyncClient() as client:
-        google_resp = await client.get(GOOGLE_USERINFO_URL, headers={"Authorization": auth})
-        if google_resp.status_code == 200:
-            google_data = google_resp.json()
-            google_user = google_data.get("sub") or google_data.get("email")
-            if google_user:
-                return f"google:{google_user}"
-
-        twitch_resp = await client.get(TWITCH_VALIDATE_URL, headers={"Authorization": auth})
-        if twitch_resp.status_code == 200:
-            twitch_login = twitch_resp.json().get("login")
-            if twitch_login:
-                return twitch_login
-
-    raise HTTPException(status_code=401, detail="Invalid or expired token")
+    user = await resolve_user_from_auth_header(auth)
+    return user["user_id"]
 
 
 @router.get("/contacts")
